@@ -1,0 +1,60 @@
+#============================  Metricbeat modules =============================
+
+metricbeat.config.modules:
+  # Glob pattern for configuration loading
+  path: ${path.config}/modules.d/*.yml
+
+  # Set to true to enable config reloading
+  reload.enabled: false
+
+  # Period on which files under path should be checked for changes
+  reload.period: 1m
+
+#-------------------------------- System Module (Linux) --------------------------------
+# Module: system
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.4/metricbeat-module-system.html
+metricbeat.modules:
+
+- module: system
+  period: 60s
+  metricsets:
+    - cpu             # CPU usage
+    - load            # CPU load averages
+    - memory          # Memory usage
+    - diskio          # Disk IO usage
+    - filesystem      # File system usage for each mountpoint
+    - fsstat          # File system summary metrics
+  cpu.metrics: ["percentages", "normalized_percentages"]
+  enabled: true
+  
+
+- module: system
+  period: 5m
+  metricsets:
+    - network         # Network IO
+    - service
+    - process
+    - process_summary # high-level statistics on running processes
+    - socket_summary  # count of existing TCP and UDP connections and listening ports
+    - uptime          # System Uptime
+  process.include_top_n:
+    by_cpu: 5      # include top 5 processes by CPU
+    by_memory: 5   # include top 5 processes by memory
+  #service.pattern_filter: ["shibd*", "httpd*"] 
+  enabled: true
+
+  
+# =============================== Debug output to console ================================
+# output.console:
+#   enabled: true
+#   pretty: true
+
+# logging.level: debug
+
+
+#==============================Logstash============
+
+output.logstash:
+  hosts: ["10.64.110.24:5044"]
+
+
